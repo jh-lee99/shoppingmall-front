@@ -32,10 +32,11 @@ const SalesList: React.FC = () => {
     try {
       // AWS SDK의 S3 인스턴스 생성
       const s3 = new AWS.S3();
+      const bucketname = process.env.BUCKET_NAME || ''
   
       // S3.listObjectsV2 메서드를 사용하여 버킷 내 모든 객체를 가져옴
       const params: AWS.S3.ListObjectsV2Request = {
-        Bucket: 'jun99h-just-image',
+        Bucket: bucketname,
       };
       const data = await s3.listObjectsV2(params).promise();
   
@@ -52,7 +53,7 @@ const SalesList: React.FC = () => {
 
         // S3 객체의 메타데이터 가져오기
         const metadataParams = {
-          Bucket: 'jun99h-just-image',
+          Bucket: bucketname,
           Key: obj.Key,
         };
         const metadataResponse = await s3.getObject(metadataParams).promise();
