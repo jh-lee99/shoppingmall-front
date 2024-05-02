@@ -6,10 +6,12 @@ import { StringUtils } from "../../utils/StringUtils"; // 한글화
 import AWS from 'aws-sdk';
 
 AWS.config.update({
-  region: process.env.AWS_REGION,
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.REACT_APP_AWS_REGION,
+  accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
 })
+
+// const bucketname = process.env.REACT_APP_BUCKET_NAME || '';
 
 declare global {
   interface Window {
@@ -32,12 +34,27 @@ const SalesList: React.FC = () => {
     try {
       // AWS SDK의 S3 인스턴스 생성
       const s3 = new AWS.S3();
-      const bucketname = process.env.BUCKET_NAME || ''
+      console.log(process.env.REACT_APP_BUCKET_NAME);
+      console.log(process.env.REACT_APP_BUCKET_NAME);
+      console.log(process.env.REACT_APP_AWS_REGION);
+      console.log(process.env.REACT_APP_AWS_ACCESS_KEY_ID);
+      console.log(process.env.REACT_APP_AWS_SECRET_ACCESS_KEY);
   
-      // S3.listObjectsV2 메서드를 사용하여 버킷 내 모든 객체를 가져옴
+      const bucketName = process.env.REACT_APP_BUCKET_NAME;
+
+      if (typeof bucketName !== 'string') {
+        console.error('REACT_APP_BUCKET_NAME 환경변수가 설정되지 않았습니다.');
+        return;
+      }
+
       const params: AWS.S3.ListObjectsV2Request = {
-        Bucket: bucketname,
+        Bucket: bucketName,
       };
+
+      // S3.listObjectsV2 메서드를 사용하여 버킷 내 모든 객체를 가져옴
+      // const params: AWS.S3.ListObjectsV2Request = {
+      //   Bucket: process.env.REACT_APP_BUCKET_NAME,
+      // };
       const data = await s3.listObjectsV2(params).promise();
   
       // data.Contents가 undefined인 경우에 대한 처리
@@ -53,7 +70,7 @@ const SalesList: React.FC = () => {
 
         // S3 객체의 메타데이터 가져오기
         const metadataParams = {
-          Bucket: bucketname,
+          Bucket: bucketName,
           Key: obj.Key,
         };
         const metadataResponse = await s3.getObject(metadataParams).promise();
@@ -75,8 +92,6 @@ const SalesList: React.FC = () => {
     }
   };
   
-
-
   const handleImageClick = async (sales: Sales) => {
     try {
       const merchant_uid = generateMerchantUid();

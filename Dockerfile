@@ -10,6 +10,19 @@ ENV TZ=Asia/Seoul
 # 호스트 머신의 현재 디렉토리 파일들을 컨테이너 내부로 전부 복사
 COPY . .
 
+# 리액트 파일 빌드 시 환경변수가 사라지기 때문에 빌드 단계에서 사용할 환경변수 설정이 필요함 
+ARG REACT_APP_BUCKET_NAME
+ARG REACT_APP_AWS_REGION
+ARG REACT_APP_AWS_ACCESS_KEY_ID
+ARG REACT_APP_AWS_SECRET_ACCESS_KEY
+ARG REACT_APP_BUCKET_NAME
+
+ENV REACT_APP_BUCKET_NAME $REACT_APP_BUCKET_NAME
+ENV REACT_APP_AWS_REGION $REACT_APP_AWS_REGION
+ENV REACT_APP_AWS_ACCESS_KEY_ID $REACT_APP_AWS_ACCESS_KEY_ID
+ENV REACT_APP_AWS_SECRET_ACCESS_KEY $REACT_APP_AWS_SECRET_ACCESS_KEY
+ENV REACT_APP_BUCKET_NAME $REACT_APP_BUCKET_NAME
+
 # 빌드를 실행합니다.
 RUN apk add g++ make py3-pip && npm install && npm run build
 
@@ -24,7 +37,6 @@ COPY --from=build /app/build /usr/share/nginx/html
 
 # nginx 설정 파일을 적용한다.
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf.template
-# COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY docker-entrypoint.sh /
 
